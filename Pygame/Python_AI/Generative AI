@@ -1,0 +1,91 @@
+# import speech_recognition as sr
+# import win32com.client
+# import webbrowser
+
+# # Initialize speaker
+# speaker = win32com.client.Dispatch("SAPI.SpVoice")
+
+# # Function to take voice input
+# def takecommand():
+#     r = sr.Recognizer()
+#     with sr.Microphone() as source:
+#         print("🎙️ Listening...")
+#         r.pause_threshold = 1
+
+#         try:
+#             audio = r.listen(source, timeout=5, phrase_time_limit=5)
+#             print("🧠 Recognizing...")
+#             query = r.recognize_google(audio, language="en")
+#             print(f"✅ You said: {query}")
+#             return query
+#         except sr.WaitTimeoutError:
+#             print("⏱️ Timeout: No speech detected.")
+#         except sr.UnknownValueError:
+#             print("❌ Could not understand audio.")
+#         except sr.RequestError as e:
+#             print(f"❌ API error: {e}")
+#         return "None"
+
+# # Main loop
+# while True:
+#     print("\nEnter something to speak (or 'exit' to quit):")
+#     s = input(">>> ")
+#     if s.lower() == "exit":
+#         break
+
+#     speaker.Speak(s)
+
+#     print("🗣️ Now speak something...")
+#     text = takecommand()
+
+#     # ✅ FIXED: This must be INSIDE the loop
+#     sites = {
+#         "youtube": "https://youtube.com",
+#         "google": "https://google.com"
+#     }
+
+#     for key, url in sites.items():
+#         if f"open {key}" in text.lower():
+#             speaker.Speak(f"Opening {key}")
+#             webbrowser.open(url)
+
+#     if text != "None":
+#         speaker.Speak(f"You said: {text}")
+
+
+import webbrowser
+import win32com.client
+
+# Initialize speaker
+speaker = win32com.client.Dispatch("SAPI.SpVoice")
+
+# Website shortcuts
+sites = {
+    "youtube": "https://youtube.com",
+    "google": "https://google.com",
+    "chatgpt": "https://chat.openai.com",
+    "github": "https://github.com"
+}
+
+# Main loop
+while True:
+    print("\nType a command (e.g., 'open youtube') or type 'exit' to quit:")
+    user_input = input(">>> ").strip().lower()
+
+    if user_input == "exit":
+        speaker.Speak("Goodbye!")
+        break
+
+    # Speak the user input
+    speaker.Speak(f"You said: {user_input}")
+
+    # Check if it starts with "open" and match site
+    if user_input.startswith("open "):
+        site_name = user_input.replace("open ", "").strip()
+        if site_name in sites:
+            speaker.Speak(f"Opening {site_name}")
+            webbrowser.open(sites[site_name])
+        else:
+            speaker.Speak(f"Sorry, I don't know how to open {site_name}")
+    else:
+        speaker.Speak("Unknown command. Try starting with 'open'")
